@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>huadenghuo · 零依赖科学沙盒</title>
+<style>
+  :root{
+    --bg:#0d1116; --panel:#151b21; --panel2:#1a222a; --line:#2a3642;
+    --txt:#e8edf2; --dim:#8b98a5; --acc:#4cc9f0;
+  }
+  *{ box-sizing:border-box; }
+  body{
+    margin:0; background:var(--bg); color:var(--txt); min-height:100vh;
+    font-family:"Segoe UI", system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    -webkit-tap-highlight-color:transparent;
+    background-image:radial-gradient(circle at 20% 0%, #16222c 0%, transparent 55%),
+                     radial-gradient(circle at 85% 10%, #1a2430 0%, transparent 45%);
+  }
+  .wrap{ max-width:1120px; margin:0 auto; padding:56px 22px 72px; }
+
+  /* ---------- 头部 ---------- */
+  header{ margin-bottom:44px; }
+  .logo{
+    display:inline-flex; align-items:center; gap:10px; font-size:13px; color:var(--dim);
+    border:1px solid var(--line); background:var(--panel); border-radius:20px;
+    padding:5px 14px; margin-bottom:22px;
+  }
+  .logo i{ width:7px; height:7px; border-radius:50%; background:var(--acc);
+           box-shadow:0 0 9px var(--acc); font-style:normal; }
+  h1{ font-size:clamp(26px,5vw,40px); margin:0 0 14px; letter-spacing:-.4px; line-height:1.22; }
+  h1 em{ font-style:normal; color:var(--acc); }
+  .sub{ color:var(--dim); font-size:15px; line-height:1.75; max-width:660px; margin:0; }
+  .sub b{ color:#b9c6d2; font-weight:600; }
+
+  /* ---------- 卡片网格 ---------- */
+  .grid{ display:grid; gap:16px; grid-template-columns:repeat(auto-fit, minmax(320px,1fr)); }
+  .card{
+    position:relative; display:block; text-decoration:none; color:inherit; overflow:hidden;
+    background:linear-gradient(160deg,var(--panel2),var(--panel));
+    border:1px solid var(--line); border-radius:14px; padding:22px 22px 20px;
+    transition:border-color .18s, transform .18s, box-shadow .18s;
+  }
+  .card:hover{
+    border-color:var(--acc); transform:translateY(-3px);
+    box-shadow:0 10px 32px -12px rgba(76,201,240,.32);
+  }
+  .card::after{
+    content:""; position:absolute; inset:0; pointer-events:none; opacity:0;
+    background:linear-gradient(160deg, rgba(76,201,240,.07), transparent 60%);
+    transition:opacity .18s;
+  }
+  .card:hover::after{ opacity:1; }
+  .top{ display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+  .ico{ font-size:27px; line-height:1; filter:saturate(1.15); }
+  .name{ font-size:17px; font-weight:700; letter-spacing:.1px; }
+  .en{ font-size:11px; color:var(--dim); font-weight:400; margin-left:6px; letter-spacing:.4px; }
+  .desc{ color:var(--dim); font-size:13.5px; line-height:1.72; margin:0 0 16px; min-height:46px; }
+  .tags{ display:flex; flex-wrap:wrap; gap:6px; }
+  .tag{
+    font-size:11px; color:#9fb0be; background:#202b35; border:1px solid #2f3d4a;
+    border-radius:20px; padding:3px 10px; white-space:nowrap;
+  }
+  .go{
+    margin-top:18px; display:inline-flex; align-items:center; gap:7px;
+    font-size:13px; font-weight:600; color:var(--acc);
+  }
+  .go span{ transition:transform .18s; }
+  .card:hover .go span{ transform:translateX(4px); }
+  .new{
+    position:absolute; top:16px; right:16px; font-size:10.5px; font-weight:700;
+    color:#0d1116; background:var(--acc); border-radius:20px; padding:2.5px 9px; letter-spacing:.5px;
+  }
+
+  /* ---------- 说明区 ---------- */
+  .note{
+    margin-top:50px; padding:26px 26px 22px; border:1px solid var(--line);
+    border-radius:14px; background:var(--panel);
+  }
+  .note h2{ font-size:15px; margin:0 0 16px; letter-spacing:.2px; }
+  .facts{ display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); }
+  .fact{ font-size:13px; color:var(--dim); line-height:1.68; }
+  .fact b{ display:block; color:var(--txt); font-size:13.5px; margin-bottom:3px; font-weight:600; }
+
+  footer{
+    margin-top:44px; padding-top:22px; border-top:1px solid var(--line);
+    color:#6d7b88; font-size:12.5px; display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center;
+  }
+  footer a{ color:#8b98a5; text-decoration:none; border-bottom:1px dotted #3a4b5a; }
+  footer a:hover{ color:var(--acc); border-color:var(--acc); }
+  @media (max-width:560px){
+    .wrap{ padding:38px 16px 52px; }
+    .grid{ grid-template-columns:1fr; }
+    .desc{ min-height:auto; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo"><i></i>huadenghuo.github.io</div>
+    <h1>把想法做成<em>真的能跑起来</em>的东西</h1>
+    <p class="sub">
+      六个在浏览器里直接运行的<b>科学沙盒</b>。全部<b>零依赖、单文件</b>——打开即玩，不装任何东西。
+      引擎都是自己写的数值模拟：物理、化学、生态、引力，不是调库。
+    </p>
+  </header>
+
+  <div class="grid">
+
+    <a class="card" href="https://huadenghuo.github.io/ecosystem-lab/">
+      <div class="new">最新</div>
+      <div class="top"><div class="ico">🌿</div><div><span class="name">生态系统模拟器</span><span class="en">ECOSYSTEM LAB</span></div></div>
+      <p class="desc">六物种四营养级生态模拟。能量守恒账本误差 &lt;0.001%，采用 Kleiber 代谢定律与 Type III 功能反应，捕食者-猎物振荡与营养级联自然涌现。</p>
+      <div class="tags"><span class="tag">六物种共存 12/12</span><span class="tag">能量守恒</span><span class="tag">63 项测试</span></div>
+      <div class="go">进入沙盒 <span>→</span></div>
+    </a>
+
+    <a class="card" href="https://huadenghuo.github.io/orbit-lab/">
+      <div class="top"><div class="ico">🪐</div><div><span class="name">天体轨道实验室</span><span class="en">ORBIT LAB</span></div></div>
+      <p class="desc">交互式 N 体轨道力学沙盒。三种积分器同场对比（半隐式欧拉 / 蛙跳 / RK4），能量守恒误差实时成曲线，三体八字混沌与引力弹弓。</p>
+      <div class="tags"><span class="tag">N 体引力</span><span class="tag">三积分器</span><span class="tag">18 项测试</span></div>
+      <div class="go">进入沙盒 <span>→</span></div>
+    </a>
+
+    <a class="card" href="https://huadenghuo.github.io/physics-lab/">
+      <div class="top"><div class="ico">🧪</div><div><span class="name">物理实验沙盒</span><span class="en">PHYSICS LAB</span></div></div>
+      <p class="desc">小球、斜面、磁场、电场。自研物理引擎：240Hz 半隐式欧拉积分、洛伦兹力矢量旋转、库仑摩擦滚动判定。</p>
+      <div class="tags"><span class="tag">自研引擎</span><span class="tag">240Hz</span><span class="tag">17 项测试</span></div>
+      <div class="go">进入沙盒 <span>→</span></div>
+    </a>
+
+    <a class="card" href="https://huadenghuo.github.io/chemlab/">
+      <div class="top"><div class="ico">⚗️</div><div><span class="name">化学虚拟实验室</span><span class="en">CHEM LAB</span></div></div>
+      <p class="desc">试剂架上有 86 种物种、46 条反应。pH 用二分法数值求解，含 Ksp 沉淀与溶解度平衡。</p>
+      <div class="tags"><span class="tag">46 条反应</span><span class="tag">pH 数值解</span><span class="tag">54 项测试</span></div>
+      <div class="go">进入沙盒 <span>→</span></div>
+    </a>
+
+    <a class="card" href="https://huadenghuo.github.io/evolution-sim/">
+      <div class="top"><div class="ico">🦁</div><div><span class="name">草原进化模拟器</span><span class="en">EVOLUTION SIM</span></div></div>
+      <p class="desc">草—兔—狼三级食物网，观察 Lotka-Volterra 种群振荡。个体带基因，自然选择在实时发生。</p>
+      <div class="tags"><span class="tag">食物网</span><span class="tag">种群振荡</span><span class="tag">自然选择</span></div>
+      <div class="go">进入沙盒 <span>→</span></div>
+    </a>
+
+    <a class="card" href="https://huadenghuo.github.io/logic-sandbox/">
+      <div class="top"><div class="ico">⚡</div><div><span class="name">电路逻辑沙盒</span><span class="en">LOGIC SANDBOX</span></div></div>
+      <p class="desc">赛博朋克风格的数字电路模拟器。拖拽搭建逻辑门，实时电平传播，内置半加器与环形振荡器预设。</p>
+      <div class="tags"><span class="tag">逻辑门</span><span class="tag">实时传播</span><span class="tag">拖拽搭建</span></div>
+      <div class="go">进入沙盒 <span>→</span></div>
+    </a>
+
+  </div>
+
+  <div class="note">
+    <h2>共同特点</h2>
+    <div class="facts">
+      <div class="fact"><b>零依赖 · 单文件</b>每个沙盒就是一个 HTML 文件，浏览器打开即用，不需要安装环境或联网加载资源。</div>
+      <div class="fact"><b>自研数值内核</b>物理、化学、生态、引力引擎都是手写的模拟，没有调用现成物理库。</div>
+      <div class="fact"><b>带回归测试</b>用 Node 直接跑 <code>node test.mjs</code>，共 150+ 项数值与行为断言，防止调参时改坏。</div>
+      <div class="fact"><b>守恒量校验</b>能量与轨道动量都做了守恒核对，误差在界面上实时可查。</div>
+    </div>
+  </div>
+
+  <div class="note" style="margin-top:16px">
+    <h2>为什么做这些</h2>
+    <p style="color:var(--dim);font-size:13.5px;line-height:1.85;margin:0;max-width:760px">
+      市面上的教学模拟器大多要装环境、连 CDN、或者把现象"演"出来给用户看。
+      我想做的是另一件事：<b style="color:#b9c6d2">把真实规律写成代码，让现象自己涌现</b>。
+      生态模拟器里的捕食者-猎物振荡没有一行代码去"制造"它，它只是能量流动的自然结果；
+      轨道实验室里的三体混沌亦然。<br><br>
+      这也是为什么这些沙盒都带<b style="color:#b9c6d2">守恒量校验和回归测试</b>——
+      如果物理规律写错了，数字会立刻戳穿它。
+    </p>
+  </div>
+
+  <footer>
+    <span>© huadenghuo · 六个零依赖科学沙盒</span>
+    <a href="https://github.com/huadenghuo?tab=repositories">全部仓库</a>
+    <a href="https://github.com/huadenghuo">GitHub</a>
+    <a href="https://github.com/huadenghuo/huadenghuo/issues">提建议</a>
+  </footer>
+
+</div>
+</body>
+</html>
